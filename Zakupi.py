@@ -31,8 +31,12 @@ except Exception:
 # =========================================================
 # KONFIG (default putanje)
 # =========================================================
-DEFAULT_PDF_DIR = r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents\ZAKUPI"
+#DEFAULT_PDF_DIR = r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents\ZAKUPI"
+#DEFAULT_EXCEL_PATH = r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents\Zakupi_obrada\Zakup.xlsx"
+
+DEFAULT_PDF_DIR = r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents\Zakupi_ugovori"
 DEFAULT_EXCEL_PATH = r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents\Zakupi_obrada\Zakup.xlsx"
+
 DEFAULT_SHEET = "Zakupi"
 
 TESSERACT_CMD = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -85,24 +89,27 @@ LOCATION_MAP: Dict[str, Dict[str, str]] = {
 
 from urllib.parse import quote
 
-# OneDrive mapping (LOCAL -> WEB)
-ONEDRIVE_LOCAL_ROOT = Path(r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents")
-ONEDRIVE_WEB_BASE = "https://icars-my.sharepoint.com/personal/hr_mdrauto_intercars_eu/Documents/Documents"
+#ONEDRIVE_LOCAL_ROOT = Path(
+#    r"C:\Users\hr.mdrauto\OneDrive - Inter Cars S.A\Documents"
+#)
+
+ONEDRIVE_LOCAL_ROOT = Path.home() / "OneDrive - Inter Cars S.A" / "Documents"
+
+ONEDRIVE_WEB_BASE = (
+    "https://icars-my.sharepoint.com/"
+    "personal/hr_mdrauto_intercars_eu/"
+    "Documents/Documents"
+)
+
 
 def onedrive_web_url_for_path(file_path: Path) -> str:
-    """
-    Pretvori lokalni OneDrive path u SharePoint/OneDrive web URL bez share tokena.
-    Radi ako je korisnik prijavljen i ima prava na datoteku.
-    """
     p = file_path.resolve()
 
     try:
-        rel = p.relative_to(ONEDRIVE_LOCAL_ROOT).as_posix()  # npr. "ZAKUPI/H02 - ... .pdf"
+        rel = p.relative_to(ONEDRIVE_LOCAL_ROOT).as_posix()
     except ValueError:
-        # nije unutar OneDrive roota -> ne možemo napraviti web link
         return ""
 
-    # URL-encode sve osim "/" (da zadrži folder strukturu)
     rel_enc = quote(rel, safe="/")
     return f"{ONEDRIVE_WEB_BASE}/{rel_enc}?web=1"
 
